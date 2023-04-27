@@ -10,7 +10,7 @@ import os
 os.chdir(oProject.GetPath())
 
 from parse import parse
-rectangles = parse("design.pcb")
+rectangles, substrate = parse("design.pcb")
 names = ""
 i = 0
 for rect in rectangles:
@@ -29,19 +29,8 @@ for rect in rectangles:
         [
             "NAME:Attributes",
             "Name:=", "Rectangle{}".format(i),
-            "Flags:=", "",
-            "Color:=", "(143 175 143)",
-            "Transparency:=", 0,
-            "PartCoordinateSystem:=", "Global",
-            "UDMId:=", "",
-            "MaterialValue:=", "\"vacuum\"",
-            "SurfaceMaterialValue:=", "\"\"",
-            "SolveInside:=", True,
-            "ShellElement:=", False,
-            "ShellElementThickness:=", "1mm",
-            "IsMaterialEditable:=", True,
-            "UseMaterialAppearance:=", False,
-            "IsLightweight:=", False
+            "SolveInside:="		, False,
+            "MaterialValue:="	, "\"copper\"",
         ])
     i+=1
 
@@ -53,7 +42,7 @@ oEditor.ThickenSheet(
 	], 
 	[
 		"NAME:SheetThickenParameters",
-		"Thickness:="		, "1mm",
+		"Thickness:="		, substrate.Thickness,
 		"BothSides:="		, False,
 		[
 			"NAME:ThickenAdditionalInfo",
@@ -85,4 +74,75 @@ oEditor.Unite(
 	[
 		"NAME:UniteParameters",
 		"KeepOriginals:="	, False
+	])
+
+oEditor.ChangeProperty(
+	[
+		"NAME:AllTabs",
+		[
+			"NAME:Geometry3DAttributeTab",
+			[
+				"NAME:PropServers", 
+				"Rectangle0"
+			],
+			[
+				"NAME:ChangedProps",
+				[
+					"NAME:Material Appearance",
+					"Value:="		, False
+				],
+				[
+					"NAME:Material Appearance",
+					"Value:="		, True
+				]
+			]
+		]
+	])
+
+oEditor.CreateRectangle(
+        [
+            "NAME:RectangleParameters",
+            "IsCovered:=", True,
+            "XStart:=", "{}".format(substrate.Rectangle.XStart),
+            "YStart:=", "{}".format(substrate.Rectangle.YStart),
+            "ZStart:=", "{}".format(substrate.Rectangle.ZStart),
+            "Width:=", "{}".format(substrate.Rectangle.Width),
+            "Height:=", "{}".format(substrate.Rectangle.Height),
+            "WhichAxis:=", "Z"
+        ], 
+        [
+            "NAME:Attributes",
+            "Name:=", "Substrate",
+        ])
+
+oEditor.ThickenSheet(
+	[
+		"NAME:Selections",
+		"Selections:="		, "Substrate",
+		"NewPartsModelFlag:="	, "Model"
+	], 
+	[
+		"NAME:SheetThickenParameters",
+		"Thickness:="		, "-" + substrate.Height,
+		"BothSides:="		, False,
+		[
+			"NAME:ThickenAdditionalInfo",
+			[
+				"NAME:ShellThickenDirectionInfo",
+				"SampleFaceID:="	, 3119,
+				"ComponentSense:="	, True,
+				[
+					"NAME:PointOnSampleFace",
+					"X:="			, "0mm",
+					"Y:="			, "0mm",
+					"Z:="			, "0mm"
+				],
+				[
+					"NAME:DirectionAtPoint",
+					"X:="			, "0mm",
+					"Y:="			, "0mm",
+					"Z:="			, "1mm"
+				]
+			]
+		]
 	])
