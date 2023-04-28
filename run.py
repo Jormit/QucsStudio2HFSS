@@ -11,6 +11,8 @@ os.chdir(oProject.GetPath())
 
 from parse import parse
 rectangles, substrate = parse("design.pcb")
+
+########################### DRAW COPPER RECTANGLES ############################
 names = ""
 i = 0
 for rect in rectangles:
@@ -89,30 +91,28 @@ oEditor.ChangeProperty(
 				"NAME:ChangedProps",
 				[
 					"NAME:Material Appearance",
-					"Value:="		, False
-				],
-				[
-					"NAME:Material Appearance",
 					"Value:="		, True
 				]
 			]
 		]
 	])
 
+########################### DRAW SUBSTRATE ############################
 oEditor.CreateRectangle(
         [
             "NAME:RectangleParameters",
             "IsCovered:=", True,
-            "XStart:=", "{}".format(substrate.Rectangle.XStart),
-            "YStart:=", "{}".format(substrate.Rectangle.YStart),
+            "XStart:=", "{}".format(substrate.Rectangle.XStart - substrate.Rectangle.Width / 5),
+            "YStart:=", "{}".format(substrate.Rectangle.YStart - substrate.Rectangle.Height / 5),
             "ZStart:=", "{}".format(substrate.Rectangle.ZStart),
-            "Width:=", "{}".format(substrate.Rectangle.Width),
-            "Height:=", "{}".format(substrate.Rectangle.Height),
+            "Width:=", "{}".format(substrate.Rectangle.Width * 1.4),
+            "Height:=", "{}".format(substrate.Rectangle.Height * 1.4),
             "WhichAxis:=", "Z"
         ], 
         [
             "NAME:Attributes",
             "Name:=", "Substrate",
+            "MaterialValue:="	, "\"FR4_epoxy\"",
         ])
 
 oEditor.ThickenSheet(
@@ -142,6 +142,95 @@ oEditor.ThickenSheet(
 					"X:="			, "0mm",
 					"Y:="			, "0mm",
 					"Z:="			, "1mm"
+				]
+			]
+		]
+	])
+
+oEditor.ChangeProperty(
+	[
+		"NAME:AllTabs",
+		[
+			"NAME:Geometry3DAttributeTab",
+			[
+				"NAME:PropServers", 
+				"Substrate"
+			],
+			[
+				"NAME:ChangedProps",
+				[
+					"NAME:Material Appearance",
+					"Value:="		, True
+				]
+			]
+		]
+	])
+
+########################### DRAW GROUND ############################
+oEditor.CreateRectangle(
+        [
+            "NAME:RectangleParameters",
+            "IsCovered:=", True,
+            "XStart:=", "{}".format(substrate.Rectangle.XStart - substrate.Rectangle.Width / 5),
+            "YStart:=", "{}".format(substrate.Rectangle.YStart - substrate.Rectangle.Height / 5),
+            "ZStart:=", "{}".format("-" + substrate.Height),
+            "Width:=", "{}".format(substrate.Rectangle.Width * 1.4),
+            "Height:=", "{}".format(substrate.Rectangle.Height * 1.4),
+            "WhichAxis:=", "Z"
+        ], 
+        [
+            "NAME:Attributes",
+            "Name:=", "Ground",
+            "MaterialValue:="	, "\"Copper\"",
+            "SolveInside:="		, False,
+        ])
+
+oEditor.ThickenSheet(
+	[
+		"NAME:Selections",
+		"Selections:="		, "Ground",
+		"NewPartsModelFlag:="	, "Model"
+	], 
+	[
+		"NAME:SheetThickenParameters",
+		"Thickness:="		, -0.00001,
+		"BothSides:="		, False,
+		[
+			"NAME:ThickenAdditionalInfo",
+			[
+				"NAME:ShellThickenDirectionInfo",
+				"SampleFaceID:="	, 3119,
+				"ComponentSense:="	, True,
+				[
+					"NAME:PointOnSampleFace",
+					"X:="			, "0mm",
+					"Y:="			, "0mm",
+					"Z:="			, "0mm"
+				],
+				[
+					"NAME:DirectionAtPoint",
+					"X:="			, "0mm",
+					"Y:="			, "0mm",
+					"Z:="			, "1mm"
+				]
+			]
+		]
+	])
+
+oEditor.ChangeProperty(
+	[
+		"NAME:AllTabs",
+		[
+			"NAME:Geometry3DAttributeTab",
+			[
+				"NAME:PropServers", 
+				"Ground"
+			],
+			[
+				"NAME:ChangedProps",
+				[
+					"NAME:Material Appearance",
+					"Value:="		, True
 				]
 			]
 		]
